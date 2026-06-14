@@ -30,13 +30,39 @@
 #include <stdbool.h>  /* standard C99 Boolean */
 #include "sst_port.h" /* SST port for specific CPU */
 
+//----------------------------------------------------------------------------
+#ifndef SST_MAX_TASK
+#define SST_MAX_TASK 8U
+#endif
+
 /* SST Event facilities ----------------------------------------------------*/
+#ifndef SST_EVT_POOL_NUM
+#define SST_EVT_POOL_NUM 0U
+#endif
+
+#if (SST_EVT_POOL_NUM > 255U)
+#error "SST_EVT_POOL_NUM must fit in SST_Evt.poolId"
+#endif
+
+#if ((SST_MAX_TASK == 0U) || (SST_MAX_TASK > 32U))
+#error "SST_MAX_TASK must be in range 1..32"
+#endif
+
+#ifndef SST_GC
+#define SST_GC(evt_) ((void)(evt_))
+#endif
+
 /*! signal of SST event */
 typedef uint16_t SST_Signal;
 
 /*! SST event class */
 typedef struct {
     SST_Signal sig;
+
+#if (SST_EVT_POOL_NUM > 0U)
+    uint8_t poolId;
+    uint8_t refCtr;
+#endif
 } SST_Evt;
 
 /*! macro for downcasting SST events to specific Evt "subclasses" */
@@ -58,6 +84,8 @@ typedef void (*SST_Handler)(SST_Task * const me, SST_Evt const * const e);
 struct SST_Task {
     SST_Handler init;
     SST_Handler dispatch;
+
+    SST_TaskPrio prio;
 
     SST_Evt const **qBuf; /*!< ring buffer for the queue */
     SST_QCtr end;   /*!< last index into the ring buffer */

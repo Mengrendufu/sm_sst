@@ -24,9 +24,12 @@
 * DEALINGS IN THE SOFTWARE.
 ===========================================================================*/
 #include "sst.h"        /* Super-Simple Tasker (SST) */
+#include "sst_priv.h"   /* SST private package API */
 #include "dbc_assert.h" /* Design By Contract (DBC) assertions */
 
 DBC_MODULE_NAME("sst")  /* for DBC assertions in this module */
+
+SST_Task *SST_tasks_[SST_MAX_TASK + 1U];
 
 /*..........................................................................*/
 int SST_Task_run(void) {
@@ -46,6 +49,7 @@ void SST_Task_ctor(
 {
     me->init = init;
     me->dispatch = dispatch;
+    me->prio = 0U;
 }
 /*..........................................................................*/
 void SST_Task_start(
@@ -56,10 +60,12 @@ void SST_Task_start(
 {
     /*! @pre
     * - the priority must be greater than zero
+    * - the priority must fit the configured task registry
     * - the queue storage and length must be provided
     */
     DBC_REQUIRE(200,
         (0U < prio)
+        && (prio <= SST_MAX_TASK)
         && (qBuf != (SST_Evt const **)0) && (qLen > 0U));
 
     me->qBuf  = qBuf;
@@ -68,7 +74,14 @@ void SST_Task_start(
     me->tail  = 0U;
     me->nUsed = 0U;
 
-    SST_Task_setPrio(me, prio);
+    SST_PORT_CRIT_STAT
+    SST_PORT_CRIT_ENTRY();
+    DBC_REQUIRE(201, SST_tasks_[prio] == (SST_Task *)0);
+    me->prio = prio;
+    SST_tasks_[prio] = me;
+    SST_PORT_CRIT_EXIT();
+
+    SST_Task_portStart_(me);
 
     /* initialize this task with the initialization event */
     (*me->init)(me, ie); /* NOTE: virtual call */
@@ -78,9 +91,19 @@ void SST_Task_start(
 void SST_Task_post(SST_Task * const me, SST_Evt const * const e) {
     /*! @pre the queue must be sized adequately and cannot overflow */
     DBC_REQUIRE(300, me->nUsed <= me->end);
+    DBC_REQUIRE(301, e != (SST_Evt const *)0);
 
     SST_PORT_CRIT_STAT
     SST_PORT_CRIT_ENTRY();
+
+#if (SST_EVT_POOL_NUM > 0U)
+    if (e->poolId != 0U) {
+        DBC_INVARIANT(302, e->poolId <= SST_EVT_POOL_NUM);
+        DBC_INVARIANT(303, e->refCtr < 255U);
+        ++((SST_Evt *)e)->refCtr;
+    }
+#endif // (SST_EVT_POOL_NUM > 0U)
+
     me->qBuf[me->head] = e; /* insert event into the queue */
     if (me->head == 0U) {   /* need to wrap the head? */
         me->head = me->end; /* wrap around */
@@ -103,6 +126,12 @@ void SST_TimeEvt_ctor(
     SST_Task *task)
 {
     me->super.sig = sig;
+
+#if (SST_EVT_POOL_NUM > 0U)
+    me->super.poolId = 0U;
+    me->super.refCtr = 0U;
+#endif // (SST_EVT_POOL_NUM > 0U)
+
     me->task = task;
     me->ctr = 0U;
     me->interval = 0U;

@@ -92,6 +92,10 @@ void SST_Task_setPrio(SST_Task * const me, SST_TaskPrio prio) {
                 && (0U < prio)
                 && (prio <= SST_MAX_TASK)
                 && (prio <= (0xFFU >> nvic_prio_shift)));
+    DBC_REQUIRE(201, SST_tasks_[prio] == (SST_Task *)0);
+
+    me->prio = prio;
+    SST_tasks_[prio] = me;
 
     /* convert the SST direct priority (1,2,..) to NVIC priority... */
     uint32_t nvic_prio = ((0xFFU >> nvic_prio_shift) + 1U - prio)
@@ -99,10 +103,6 @@ void SST_Task_setPrio(SST_Task * const me, SST_TaskPrio prio) {
 
     SST_PORT_CRIT_STAT
     SST_PORT_CRIT_ENTRY();
-
-    DBC_REQUIRE(201, SST_tasks_[prio] == (SST_Task *)0);
-    me->prio = prio;
-    SST_tasks_[prio] = me;
 
     /* set the Task priority of the associated IRQ */
     uint32_t tmp = NVIC_IP[me->nvic_irq >> 2U];

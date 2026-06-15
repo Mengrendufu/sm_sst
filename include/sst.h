@@ -71,9 +71,6 @@ typedef struct {
 /* SST Task facilities -----------------------------------------------------*/
 typedef struct SST_Task SST_Task; /* forward declaration */
 
-/*! SST Task priority */
-typedef uint8_t SST_TaskPrio;
-
 /*! SST internal event-queue counter */
 typedef uint8_t SST_QCtr;
 

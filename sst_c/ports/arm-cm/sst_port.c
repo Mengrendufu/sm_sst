@@ -24,6 +24,7 @@
 * DEALINGS IN THE SOFTWARE.
 ===========================================================================*/
 #include "sst.h"        /* Super-Simple Tasker (SST/C) */
+#include "sst_priv.h"   /* SST private package API */
 #include "dbc_assert.h" /* Design By Contract (DBC) assertions */
 
 DBC_MODULE_NAME("sst_port") /* for DBC assertions in this module */
@@ -88,6 +89,8 @@ void SST_Task_setPrio(SST_Task * const me, SST_TaskPrio prio) {
     */
     DBC_REQUIRE(200,
                 (me->nvic_irq != 0U)
+                && (0U < prio)
+                && (prio <= SST_MAX_TASK)
                 && (prio <= (0xFFU >> nvic_prio_shift)));
 
     /* convert the SST direct priority (1,2,..) to NVIC priority... */
@@ -96,6 +99,11 @@ void SST_Task_setPrio(SST_Task * const me, SST_TaskPrio prio) {
 
     SST_PORT_CRIT_STAT
     SST_PORT_CRIT_ENTRY();
+
+    DBC_REQUIRE(201, SST_tasks_[prio] == (SST_Task *)0);
+    me->prio = prio;
+    SST_tasks_[prio] = me;
+
     /* set the Task priority of the associated IRQ */
     uint32_t tmp = NVIC_IP[me->nvic_irq >> 2U];
     tmp &= ~(0xFFU << ((me->nvic_irq & 3U) << 3U));

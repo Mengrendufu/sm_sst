@@ -30,7 +30,8 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 * DEALINGS IN THE SOFTWARE.
 ===========================================================================*/
-#include "sst.h"     /* Super-Simple Tasker (SST/C) */
+#include "sst.h"        /* Super-Simple Tasker (SST/C) */
+#include "sst_priv.h"   /* SST private package API */
 #include "dbc_assert.h" /* Design By Contract (DBC) assertions */
 #include "sst_port.h"
 
@@ -71,13 +72,20 @@ void SST_Task_setPrio(SST_Task * const me, SST_TaskPrio prio) {
     */
     DBC_REQUIRE(200,
                 (me->interrupt_num >= 0U)
-                && (prio <= 0b111 && prio > 0));
+                && (0U < prio)
+                && (prio <= SST_MAX_TASK)
+                && (prio <= 0b111));
 
     /* convert the SST direct priority (1,2,..) to NVIC priority... */
     //no need for dspic -> 1 lowest -> 7 highest
 
     SST_PORT_CRIT_STAT
     SST_PORT_CRIT_ENTRY();
+
+    DBC_REQUIRE(201, SST_tasks_[prio] == (SST_Task *)0);
+    me->prio = prio;
+    SST_tasks_[prio] = me;
+
     /* set the Task priority of the associated IRQ */
     interrupt_SetPriority(me->interrupt_num, prio);
 

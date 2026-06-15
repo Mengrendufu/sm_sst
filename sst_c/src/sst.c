@@ -64,9 +64,9 @@ void SST_Task_start(
     * - the queue storage and length must be provided
     */
     DBC_REQUIRE(200,
-        (0U < prio)
-        && (prio <= SST_MAX_TASK)
-        && (qBuf != (SST_Evt const **)0) && (qLen > 0U));
+        (0U < prio) &&
+        (prio <= SST_MAX_TASK) &&
+        (qBuf != (SST_Evt const **)0) && (qLen > 0U));
 
     me->qBuf  = qBuf;
     me->end   = qLen - 1U;
@@ -74,14 +74,7 @@ void SST_Task_start(
     me->tail  = 0U;
     me->nUsed = 0U;
 
-    SST_PORT_CRIT_STAT
-    SST_PORT_CRIT_ENTRY();
-    DBC_REQUIRE(201, SST_tasks_[prio] == (SST_Task *)0);
-    me->prio = prio;
-    SST_tasks_[prio] = me;
-    SST_PORT_CRIT_EXIT();
-
-    SST_Task_portStart_(me);
+    SST_Task_setPrio(me, prio);
 
     /* initialize this task with the initialization event */
     (*me->init)(me, ie); /* NOTE: virtual call */

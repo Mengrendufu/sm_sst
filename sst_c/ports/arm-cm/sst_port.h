@@ -26,6 +26,9 @@
 #ifndef SST_PORT_H_
 #define SST_PORT_H_
 
+/*! SST Task priority */
+typedef uint8_t SST_TaskPrio;
+
 /* additional SST-PORT task attributes for ARM Cortex-M */
 #define SST_PORT_TASK_ATTR \
     uint32_t volatile *nvic_pend; \

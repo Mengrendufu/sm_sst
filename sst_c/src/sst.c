@@ -49,7 +49,6 @@ void SST_Task_ctor(
 {
     me->init = init;
     me->dispatch = dispatch;
-    me->prio = 0U;
 }
 /*..........................................................................*/
 void SST_Task_start(

@@ -105,10 +105,11 @@ void SST_publish(SST_Evt const * const e) {
         DBC_INVARIANT(603, 0U < prio);
         DBC_INVARIANT(604, prio <= SST_MAX_TASK);
 
-        SST_PORT_CRIT_ENTRY();
+        // SST_tasks_[prio] is set once during task start and never
+        // cleared (no unregister). Safe to read outside critical section.
+        // If task stop is ever added, re-add the critical section here.
         SST_Task * const target = SST_tasks_[prio];
         DBC_INVARIANT(605, target != (SST_Task *)0);
-        SST_PORT_CRIT_EXIT();
 
         SST_Task_post(target, e);
         subscr &= ~((SST_PubSubSet)1U << (prio - 1U));

@@ -30,11 +30,8 @@
 
 typedef uint32_t SST_PubSubSet;
 
-typedef struct {
-    SST_PubSubSet set;
-} SST_SubscrList;
 
-void SST_PubSub_init(SST_SubscrList * const subscrSto,
+void SST_PubSub_init(SST_PubSubSet * const subscrSto,
                      SST_Signal maxPubSig);
 void SST_Task_subscribe(SST_Task * const me, SST_Signal sig);
 void SST_Task_unsubscribe(SST_Task * const me, SST_Signal sig);

@@ -95,16 +95,14 @@ struct SST_Task {
 #endif
 };
 
-void SST_Task_ctor(
-    SST_Task * const me,
-    SST_Handler init,
-    SST_Handler dispatch);
+void SST_Task_ctor(SST_Task * const me,
+                   SST_Handler init,
+                   SST_Handler dispatch);
 
-void SST_Task_start(
-    SST_Task * const me,
-    SST_TaskPrio prio,
-    SST_Evt const **qBuf, SST_QCtr qLen,
-    SST_Evt const * const ie);
+void SST_Task_start(SST_Task * const me,
+                    SST_TaskPrio prio,
+                    SST_Evt const **qBuf, SST_QCtr qLen,
+                    SST_Evt const * const ie);
 
 void SST_Task_post(SST_Task * const me, SST_Evt const * const e);
 
@@ -136,18 +134,14 @@ struct SST_TimeEvt {
     SST_TCtr interval; /*! interval for periodic time event */
 };
 
-void SST_TimeEvt_ctor(
-    SST_TimeEvt * const me,
-    SST_Signal sig,
-    SST_Task *task);
+void SST_TimeEvt_ctor(SST_TimeEvt * const me,
+                      SST_Signal sig,
+                      SST_Task *task);
 
-void SST_TimeEvt_arm(
-    SST_TimeEvt * const me,
-    SST_TCtr ctr,
-    SST_TCtr interval);
+void SST_TimeEvt_arm(SST_TimeEvt * const me,
+                     SST_TCtr ctr, SST_TCtr interval);
 
-bool SST_TimeEvt_disarm(
-    SST_TimeEvt * const me);
+bool SST_TimeEvt_disarm(SST_TimeEvt * const me);
 
 void SST_TimeEvt_tick(void); /* static handle all instantiated time events */
 

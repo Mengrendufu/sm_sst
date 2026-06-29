@@ -42,30 +42,27 @@ int SST_Task_run(void) {
 }
 
 /*--------------------------------------------------------------------------*/
-void SST_Task_ctor(
-    SST_Task * const me,
-    SST_Handler init,
-    SST_Handler dispatch)
+void SST_Task_ctor(SST_Task * const me,
+                   SST_Handler init,
+                   SST_Handler dispatch)
 {
     me->init = init;
     me->dispatch = dispatch;
 }
 /*..........................................................................*/
-void SST_Task_start(
-    SST_Task * const me,
-    SST_TaskPrio prio,
-    SST_Evt const **qBuf, SST_QCtr qLen,
-    SST_Evt const * const ie)
+void SST_Task_start(SST_Task * const me,
+                    SST_TaskPrio prio,
+                    SST_Evt const **qBuf, SST_QCtr qLen,
+                    SST_Evt const * const ie)
 {
     /*! @pre
     * - the priority must be greater than zero
     * - the priority must fit the configured task registry
     * - the queue storage and length must be provided
     */
-    DBC_REQUIRE(200,
-        (0U < prio) &&
-        (prio <= SST_MAX_TASK) &&
-        (qBuf != (SST_Evt const **)0) && (qLen > 0U));
+    DBC_REQUIRE(200, (0U < prio) &&
+                     (prio <= SST_MAX_TASK) &&
+                     (qBuf != (SST_Evt const **)0) && (qLen > 0U));
 
     me->qBuf  = qBuf;
     me->end   = qLen - 1U;
@@ -112,10 +109,9 @@ void SST_Task_post(SST_Task * const me, SST_Evt const * const e) {
 static SST_TimeEvt *timeEvt_head = (SST_TimeEvt *)0;
 
 /*..........................................................................*/
-void SST_TimeEvt_ctor(
-    SST_TimeEvt * const me,
-    SST_Signal sig,
-    SST_Task *task)
+void SST_TimeEvt_ctor(SST_TimeEvt * const me,
+                      SST_Signal sig,
+                      SST_Task *task)
 {
     me->super.sig = sig;
 
@@ -133,10 +129,8 @@ void SST_TimeEvt_ctor(
     timeEvt_head = me;
 }
 /*..........................................................................*/
-void SST_TimeEvt_arm(
-    SST_TimeEvt * const me,
-    SST_TCtr ctr,
-    SST_TCtr interval)
+void SST_TimeEvt_arm(SST_TimeEvt * const me,
+                     SST_TCtr ctr, SST_TCtr interval)
 {
     SST_PORT_CRIT_STAT
     SST_PORT_CRIT_ENTRY();
@@ -156,10 +150,11 @@ bool SST_TimeEvt_disarm(SST_TimeEvt * const me) {
 }
 /*..........................................................................*/
 void SST_TimeEvt_tick(void) {
-    for (SST_TimeEvt *t = timeEvt_head;
-         t != (SST_TimeEvt *)0;
-         t = t->next)
-    {
+    for (
+        SST_TimeEvt *t = timeEvt_head;
+        t != (SST_TimeEvt *)0;
+        t = t->next
+    ) {
         SST_PORT_CRIT_STAT
         SST_PORT_CRIT_ENTRY();
         if (t->ctr == 0U) { /* disarmed? (most frequent case) */

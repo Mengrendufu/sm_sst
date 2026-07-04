@@ -79,16 +79,16 @@ void SST_Task_start(SST_Task * const me,
 /*..........................................................................*/
 void SST_Task_post(SST_Task * const me, SST_Evt const * const e) {
     /*! @pre the queue must be sized adequately and cannot overflow */
-    DBC_REQUIRE(300, me->nUsed <= me->end);
-    DBC_REQUIRE(301, e != (SST_Evt const *)0);
+    DBC_REQUIRE(300, me->nUsed <= me->end &&
+                     e != (SST_Evt const *)0);
 
     SST_PORT_CRIT_STAT
     SST_PORT_CRIT_ENTRY();
 
 #if (SST_EVT_POOL_NUM > 0U)
     if (e->poolId != 0U) {
-        DBC_INVARIANT(302, e->poolId <= SST_EVT_POOL_NUM);
-        DBC_INVARIANT(303, e->refCtr < 255U);
+        DBC_INVARIANT(302, e->poolId <= SST_EVT_POOL_NUM &&
+                           e->refCtr < 255U);
         ++((SST_Evt *)e)->refCtr;
     }
 #endif // (SST_EVT_POOL_NUM > 0U)

@@ -92,8 +92,8 @@ void SST_publish(SST_Evt const * const e) {
     SST_SubscrSet subscr = l_subscr_[e->sig];
 #if (SST_EVT_POOL_NUM > 0U)
     if (e->poolId != 0U) {
-        DBC_INVARIANT(606, e->poolId <= SST_EVT_POOL_NUM
-                           && e->refCtr < 255U);
+        DBC_INVARIANT(606, e->poolId <= SST_EVT_POOL_NUM &&
+                           e->refCtr < 255U);
         ++((SST_Evt *)e)->refCtr;
     }
 #endif // (SST_EVT_POOL_NUM > 0U)
@@ -103,7 +103,7 @@ void SST_publish(SST_Evt const * const e) {
     while (subscr != (SST_SubscrSet)0) {
         SST_TaskPrio const prio = (SST_TaskPrio)SST_LOG2(subscr);
         DBC_INVARIANT(603, (0U < prio && prio <= SST_MAX_TASK) &&
-                           SST_tasks_[prio] != (SST_Task *)0);
+                           (SST_tasks_[prio] != (SST_Task *)0));
 
         // SST_tasks_[prio] is set once during task start and never
         // cleared (no unregister). Safe to read outside critical section.

@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+/* lo: SST, hi: host framework; pack as (framework << 8) | sst */
 typedef uint16_t SST_TaskPrio;
 
 #define SST_PRIO(sst_, framework_) \

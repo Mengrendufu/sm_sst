@@ -59,8 +59,12 @@ void SST_Task_start(SST_Task * const me,
     * - the priority must be greater than zero
     * - the priority must fit the configured task registry
     * - the queue storage and length must be provided
+    *
+    * NOTE: when SST_TaskPrio is wider than 8 bits (mixed host RTOS),
+    * only the low byte is the SST logical priority; the high byte is
+    * owned by the port / host framework.
     */
-    uint8_t const sstPrio = (uint8_t)prio;
+    uint8_t const sstPrio = (uint8_t)prio; /* low byte = SST priority */
     DBC_REQUIRE(200, (0U < sstPrio) &&
                      (sstPrio <= SST_MAX_TASK) &&
                      (qBuf != (SST_Evt const **)0) && (qLen > 0U));

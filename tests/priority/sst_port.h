@@ -7,8 +7,6 @@ typedef uint16_t SST_TaskPrio;
 
 #define SST_PRIO(sst_, framework_) \
     ((SST_TaskPrio)(((uint16_t)(framework_) << 8U) | (uint16_t)(sst_)))
-#define SST_PRIO_SST(prio_) ((uint8_t)((prio_) & 0xFFU))
-#define SST_PRIO_FRAMEWORK(prio_) ((uint8_t)((prio_) >> 8U))
 
 #define SST_PORT_TASK_OPER \
     void SST_Task_setPrio(SST_Task * const me, SST_TaskPrio prio);

@@ -35,10 +35,6 @@
 #define SST_MAX_TASK 8U
 #endif
 
-#ifndef SST_PRIO_SST
-#define SST_PRIO_SST(prio_) (prio_)
-#endif
-
 /* SST Event facilities ----------------------------------------------------*/
 #ifndef SST_EVT_POOL_NUM
 #define SST_EVT_POOL_NUM 0U

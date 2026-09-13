@@ -60,7 +60,7 @@ void SST_Task_start(SST_Task * const me,
     * - the priority must fit the configured task registry
     * - the queue storage and length must be provided
     */
-    uint8_t const sstPrio = (uint8_t)SST_PRIO_SST(prio);
+    uint8_t const sstPrio = (uint8_t)prio;
     DBC_REQUIRE(200, (0U < sstPrio) &&
                      (sstPrio <= SST_MAX_TASK) &&
                      (qBuf != (SST_Evt const **)0) && (qLen > 0U));

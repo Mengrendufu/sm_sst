@@ -20,7 +20,7 @@ void DBC_fault_handler(char const *module, int label)
 
 void SST_Task_setPrio(SST_Task * const me, SST_TaskPrio prio)
 {
-    me->prio = SST_PRIO_SST(prio);
+    me->prio = (uint8_t)prio;
     portPrio = prio;
 }
 
@@ -51,7 +51,7 @@ int main(void)
     assert(faultCount == 0U);
     assert(task.prio == 1U);
     assert(portPrio == priority);
-    assert(SST_PRIO_FRAMEWORK(portPrio) == 24U);
+    assert((uint8_t)(portPrio >> 8U) == 24U);
 
     return 0;
 }

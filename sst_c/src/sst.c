@@ -75,17 +75,10 @@ void SST_Task_start(SST_Task * const me,
     me->tail  = 0U;
     me->nUsed = 0U;
 
-#ifdef SST_PORT_TASK_INIT
-    /* The port captures ie before creating its execution context and owns
-     * when init runs. Deferred ports require ie to outlive initialization. */
-    SST_PORT_TASK_INIT(me, ie);
-#endif
     SST_Task_setPrio(me, prio);
 
-#ifndef SST_PORT_TASK_INIT
-    /* Native SST initializes synchronously in the starter's context. */
+    /* initialize this task with the initialization event */
     (*me->init)(me, ie); /* NOTE: virtual call */
-#endif
     /* TBD: implement event recycling */
 }
 /*..........................................................................*/
